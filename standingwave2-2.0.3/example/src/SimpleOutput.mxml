@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+    width="800" height="600"
+    layout="absolute"
+    applicationComplete="onApplicationComplete()">
+    
+    <mx:Script>
+        <![CDATA[
+            import com.noteflight.standingwave2.filters.CacheFilter;
+            import flash.sampler.getSize;
+            import com.noteflight.standingwave2.performance.IPerformance;
+            import com.noteflight.standingwave2.performance.QueuePerformance;
+            import com.noteflight.standingwave2.filters.BiquadFilter;
+            import com.noteflight.standingwave2.filters.ResamplingFilter;
+            import flash.utils.getTimer;
+            import com.noteflight.standingwave2.elements.AudioDescriptor;
+            import com.noteflight.standingwave2.elements.IAudioSource;
+            import com.noteflight.standingwave2.filters.EchoFilter;
+            import com.noteflight.standingwave2.filters.EnvelopeFilter;
+            import com.noteflight.standingwave2.output.AudioSampleHandler;
+            import com.noteflight.standingwave2.output.AudioPlayer;
+            import com.noteflight.standingwave2.performance.ListPerformance;
+            import com.noteflight.standingwave2.performance.AudioPerformer;
+            import com.noteflight.standingwave2.performance.PerformanceElement;
+            import com.noteflight.standingwave2.sources.SoundSource;
+            import com.noteflight.standingwave2.sources.SineSource;
+
+            // player used to play all sources in this test app
+            [Bindable]
+            public var player:AudioPlayer = new AudioPlayer(8192);
+            
+            // sound samples used for test purposes
+            [Embed(source="testing123.mp3")]
+            private var testSound1:Class;
+
+            // set of filters optionally applied to a more fundamental source            
+            private var resampler:ResamplingFilter = new ResamplingFilter();
+            private var echo:EchoFilter = new EchoFilter();
+            private var biquad:BiquadFilter = new BiquadFilter();
+            
+            // sine source
+            private var sineSource:SineSource;
+            
+            // performance queue used for sine sequences
+            private var sineSeqQueue:QueuePerformance = new QueuePerformance();
+            
+            // Cached sine sources
+            private var sineTones:Array;
+            
+            public function onApplicationComplete():void
+            {
+                initializeSineTones();
+            }
+            
+            // Initialize an array of cached sine sources that will be used to synthesize sequences
+            public function initializeSineTones():void
+            {
+                sineTones = [];
+                for (var i:int = 0; i < 24; i++)
+                {
+                    // Adjacent tones are in a ratio of 2 ^ (1/12), since there are twelve tones per octave.
+                    // The lowest is at concert A, 440 Hz.  We cache the tones to avoid computing the sine functions
+                    // during playback, which is more expensive.
+                    //
+                    var frequency:Number = 440 * Math.exp(i * Math.LN2 / 12.0)
+                    var tone:CacheFilter = new CacheFilter(new SineSource(new AudioDescriptor(), 1, frequency));
+                    tone.fill();
+                    sineTones.push(tone);
+                }
+            }
+            
+            // Play an audio source with optional filter treatments
+            public function playSource(source:IAudioSource):void
+            {
+                // frequency shifting
+                if (resampleCheckBox.selected)
+                {
+                    resampler.source = source;
+                    resampler.factor = resampleFactor.value;
+                    source = resampler;
+                }
+                
+                // echo delay line
+                if (echoCheckBox.selected)
+                {
+                    // Wrap the source in an AudioPerformer so that we can extend it with silence
+                    if (!(source is AudioPerformer))
+                    {
+                        var p:ListPerformance = new ListPerformance();
+                        p.addSourceAt(0, source);
+                        source = new AudioPerformer(p);
+                    }
+                    
+                    // Append a time interval of silence onto the end for the echoes to fade away
+                    AudioPerformer(source).duration += 2.5;
+                    
+                    echo.period = echoDelay.value;
+                    echo.source = source;
+                    source = echo;
+                }
+                
+                // linear IIR filter
+                if (biquadCheckBox.selected)
+                {
+                    biquad.source = source;
+                    biquad.type = biquadCombo.selectedItem.value;
+                    biquad.frequency = Math.exp(biquadLogFreq.value * Math.LN10)
+                    biquad.resonance = biquadResonance.value;
+                    source = biquad;
+                }
+                
+                // play our source
+                player.play(source);
+            }
+            
+            // Play a sine wave of basically infinite duration
+            public function playSine():void
+            {
+                sineSource = new SineSource(new AudioDescriptor(), int.MAX_VALUE, 440); 
+                playSource(sineSource);
+            }
+
+            // Play a cached sine tone with no envelope
+            public function playShortSine():void
+            {
+                playSource(sineTones[0]);
+            }
+            
+            // Create a ListPerformance of a shuffled 2-octave chromatic scale. 
+            public function createSineSequence():IPerformance
+            {
+                var p:ListPerformance = new ListPerformance();
+                var toneSet:Array = sineTones.slice();
+                for (var i:int = 0; i < sineTones.length; i++)
+                {
+                    // randomly select a sine tone and delete it from the set
+                    var j:int = Math.floor(toneSet.length * Math.random());
+                    var noteSource:IAudioSource = toneSet[j].clone();
+                    toneSet.splice(j, 1);
+                    
+                    // Apply an envelope to shape the tone and add it to the performance
+                    noteSource = new EnvelopeFilter(noteSource, envelopeAttack.value, envelopeDecay.value, envelopeSustain.value, envelopeHold.value, envelopeRelease.value);
+                    p.addSourceAt(i * 0.1, noteSource);
+                }
+                return p;
+            }
+            
+            // Play a random sequence of sine tones, once through
+            public function playSineSequence():void
+            {
+                playSource(new AudioPerformer(createSineSequence()));
+            }
+            
+            // Start playing a repeating sine sequence using a QueuePerformance
+            // that repeats a nested performance of a sine sequence.
+            // 
+            public function startSineSequence():void
+            {
+                sineSeqQueue = new QueuePerformance();
+                sineSeqQueue.addSource(new AudioPerformer(createSineSequence()));
+                playSource(new AudioPerformer(sineSeqQueue));
+            }
+            
+            // Enqueue a new sine sequence to be played as soon as the current one is finished.
+            //
+            public function queueSineSequence():void
+            {
+                sineSeqQueue.addSource(new AudioPerformer(createSineSequence()));
+            }
+            
+            // Play an embedded test sound.
+            public function playSound1():void
+            {
+                playSource(new SoundSource(new testSound1));
+            }
+            
+            [Bindable]
+            public var biquadTypes:Array = [
+                {label: "Low Pass", value: BiquadFilter.LOW_PASS_TYPE}, 
+                {label: "High Pass", value: BiquadFilter.HIGH_PASS_TYPE}, 
+                {label: "Band Pass", value: BiquadFilter.BAND_PASS_TYPE}
+            ];
+            
+            // Data tip function for logarithmic sliders
+            public static function logDataTip(value:Number):String
+            {
+                return int(Math.exp(value * Math.LN10)).toString();
+            }
+        ]]>
+    </mx:Script>
+    
+    <mx:VBox>
+        <mx:Button label="Stop" click="player.stop()"/>
+        <mx:Spacer height="10"/>
+        <mx:HBox>
+            <mx:Button label="Play Sine Wave" click="playSine()"/>
+            <mx:HSlider id="sineFrequency" value="440" minimum="1" maximum="1000" width="100"
+                change="sineSource.frequency = sineFrequency.value"/>
+        </mx:HBox>
+        <mx:Button label="Play 1-second Sine Wave" click="playShortSine()"/>
+        <mx:HBox>
+            <mx:Button label="One-shot Sequence" click="playSineSequence()"/>
+            <mx:Button label="Repeat Sequence" click="startSineSequence()"/>
+            <mx:Button label="Make New Sequence" click="queueSineSequence()"/>
+            <mx:Label text="A"/>
+            <mx:VSlider id="envelopeAttack" value="0.01" minimum="0" maximum="0.05" height="100"/>
+            <mx:Label text="D"/>
+            <mx:VSlider id="envelopeDecay" value="0.0" minimum="0" maximum="0.2" height="100"/>
+            <mx:Label text="S"/>
+            <mx:VSlider id="envelopeSustain" value="0.5" minimum="0" maximum="1" height="100"/>
+            <mx:Label text="H"/>
+            <mx:VSlider id="envelopeHold" value="0.05" minimum="0" maximum="0.2" height="100"/>
+            <mx:Label text="R"/>
+            <mx:VSlider id="envelopeRelease" value="0.05" minimum="0" maximum="0.2" height="100"/>
+        </mx:HBox>
+        <mx:HBox>
+            <mx:Button label="Play Embedded Sound" click="playSound1()"/>
+        </mx:HBox>
+        <mx:Spacer height="10"/>
+        <mx:HBox>
+            <mx:HBox>
+                <mx:CheckBox id="echoCheckBox" label="Echo"/>
+                <mx:VSlider id="echoDelay" value="0.4" minimum="0" maximum="2" height="100"/>
+            </mx:HBox>
+            <mx:HBox>
+                <mx:CheckBox id="resampleCheckBox" label="Resample with factor:"/>
+                <mx:VSlider id="resampleFactor" value="1" minimum="0.5" maximum="2" height="100"/>
+            </mx:HBox>
+            <mx:HBox>
+                <mx:CheckBox id="biquadCheckBox" label="Biquad"/>
+                <mx:ComboBox id="biquadCombo" dataProvider="{biquadTypes}" selectedIndex="0"/>
+                <mx:VSlider id="biquadLogFreq" value="2" minimum="0" maximum="4" height="100" dataTipFormatFunction="{logDataTip}"/>
+                <mx:VSlider id="biquadResonance" value="1" minimum="0" maximum="5" height="100"/>
+            </mx:HBox>
+        </mx:HBox>
+        <mx:Spacer height="10"/>
+        <mx:Label text="position: {player.position}"/>
+        <mx:Label text="cpu: {player.cpuPercentage}%"/>
+        <mx:Label text="latency: {player.latency}%"/>
+    </mx:VBox>
+</mx:Application>

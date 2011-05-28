@@ -1,0 +1,20 @@
+a:link { color: #0000cc; }
+body { background: #fff; margin: 3px 8px;}
+body { font-family: arial, sans-serif;}
+body { font-size: 90%;}
+td td, th th, th td, td th { font-size: 100%;}
+pre { font-size: 110%;}
+table { border-collapse: separate; }
+h1 { font-size: x-large; margin-top: 10px; }
+h2 { font-size: large; margin-top: 40px; padding-top: 10px; border-top: 3px solid #ccc;}
+h3 { font-size: medium; margin-top: 30px; margin-bottom: 0px; }
+h4 { font-size: small; }
+img { border: 0; }
+pre {
+  padding: 0.5em;
+  margin-left: 10px;
+  background-color: #eee;
+}
+tt {
+  font-size: 120%;
+}

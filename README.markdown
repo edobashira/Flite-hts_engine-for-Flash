@@ -1,44 +1,39 @@
 Flite+hts_engine in Flash
+--------------------------
 
 A port of Flite + hts_engine running in Adobe Flash plugin
+
 Paul Dixon (paul@edobashira.com)
 
-Makes use of the following excellent opensource software
+Makes use of the following excellent opensource software:
 
-minimalcomps
-http://www.minimalcomps.com
-
-standingwave
-http://code.google.com/p/standingwave/
-
-Flite + hts_engine
-http://hts-engine.sourceforge.net/
-
-Swfobject
+  - [Flite + hts_engine ](http://hts-engine.sourceforge.net/)
+  - [minimalcomps](http://www.minimalcomps.com)
+  - [Standingwave](http://code.google.com/p/standingwave/)
+  - [Swfobject](http://code.google.com/p/swfobject/)
 
 
-Installation and compilation under Cygwin/Windows.
+## Installation and compilation under Cygwin/Windows ##
 
-## Pre-requisites ##
-Download install cygwin (http://cygwin.org/)
-Download install Alchemy under cygwin (http://labs.adobe.com/technologies/alchemy/)
-Download install Flashdevelop (http://www.flashdevelop.org/wikidocs/index.php?title=Main_Page)
+### Pre-requisites ###
+  -  [Cygwin](http://cygwin.org/)
+  - [Alchemy](http://labs.adobe.com/technologies/alchemy/) installed under Cygwin 
+  -  [Flashdevelop](http://www.flashdevelop.org/wikidocs/index.php?title=Main_Page)  
 
-
-obj/htsflashConfig.xml may need editing to reflect your system paths
-
-## Build HTS Flash control##
+### Build HTS Flash control###
 From the cygwin terminal
 
-cd hts_engine_flash 
+cd /src/dic
+
 alc-on
+
 make
 
-## Build GUI ##
-run Flashdevelop
-build the project
+### Build GUI ###
+Run Flashdevelop and build the project. 
+obj/htsflashConfig.xml may need editing to reflect your system paths
 
-
+### Disclaimer ###
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, 
 INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

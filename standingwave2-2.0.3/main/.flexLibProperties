@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flexLibProperties version="1">
+<includeClasses>
+<classEntry path="com.noteflight.standingwave2.elements.AudioDescriptor"/>
+<classEntry path="com.noteflight.standingwave2.elements.IAudioFilter"/>
+<classEntry path="com.noteflight.standingwave2.elements.IAudioSource"/>
+<classEntry path="com.noteflight.standingwave2.elements.IRandomAccessSource"/>
+<classEntry path="com.noteflight.standingwave2.elements.Sample"/>
+<classEntry path="com.noteflight.standingwave2.filters.AbstractFilter"/>
+<classEntry path="com.noteflight.standingwave2.filters.BiquadFilter"/>
+<classEntry path="com.noteflight.standingwave2.filters.CacheFilter"/>
+<classEntry path="com.noteflight.standingwave2.filters.EchoFilter"/>
+<classEntry path="com.noteflight.standingwave2.filters.EnvelopeFilter"/>
+<classEntry path="com.noteflight.standingwave2.filters.GainFilter"/>
+<classEntry path="com.noteflight.standingwave2.filters.ResamplingFilter"/>
+<classEntry path="com.noteflight.standingwave2.formats.WaveFile"/>
+<classEntry path="com.noteflight.standingwave2.input.MicrophoneInput"/>
+<classEntry path="com.noteflight.standingwave2.output.AudioPlayer"/>
+<classEntry path="com.noteflight.standingwave2.output.AudioSampleHandler"/>
+<classEntry path="com.noteflight.standingwave2.performance.AudioPerformer"/>
+<classEntry path="com.noteflight.standingwave2.performance.IPerformance"/>
+<classEntry path="com.noteflight.standingwave2.performance.ListPerformance"/>
+<classEntry path="com.noteflight.standingwave2.performance.PerformanceElement"/>
+<classEntry path="com.noteflight.standingwave2.performance.QueuePerformance"/>
+<classEntry path="com.noteflight.standingwave2.sources.AbstractSource"/>
+<classEntry path="com.noteflight.standingwave2.sources.SineSource"/>
+<classEntry path="com.noteflight.standingwave2.sources.SoundSource"/>
+<classEntry path="com.noteflight.standingwave2.utils.AudioUtils"/>
+</includeClasses>
+<includeResources/>
+<namespaceManifests/>
+</flexLibProperties>

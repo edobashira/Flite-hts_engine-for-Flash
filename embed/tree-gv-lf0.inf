@@ -1,0 +1,13 @@
+QS Num-Syls_in_Utterance<=7 { "*/J:1+*","*/J:2+*","*/J:3+*","*/J:4+*","*/J:5+*","*/J:6+*","*/J:7+*" }
+QS Num-Syls_in_Utterance<=17 { "*/J:?+*","*/J:10+*","*/J:11+*","*/J:12+*","*/J:13+*","*/J:14+*","*/J:15+*","*/J:16+*","*/J:17+*" }
+QS Num-Words_in_Utterance==5 { "*+5-*" }
+QS Num-Words_in_Utterance<=3 { "*+1-*","*+2-*","*+3-*" }
+
+{*}[2]
+{
+   0 Num-Syls_in_Utterance<=7                               -1               -2      
+  -1 Num-Syls_in_Utterance<=17                           "gv_lf0_2"       "gv_lf0_1" 
+  -2 Num-Words_in_Utterance<=3                              -3            "gv_lf0_3" 
+  -3 Num-Words_in_Utterance==5                           "gv_lf0_5"       "gv_lf0_4" 
+}
+

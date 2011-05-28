@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute"
+    verticalScrollPolicy="off" horizontalScrollPolicy="off"
+    applicationComplete="onCreationComplete()"
+    modalTransparencyBlur="0"
+    invoke="handleInvoke(event)"
+    xmlns:editor="com.joeberkovitz.moccasin.editor.*"
+    xmlns:sweditor="com.joeberkovitz.simpleworld.editor.*"
+>
+    
+    <!-- SIMPLEWORLD: a sample application for the Moccasin open source graphical editing framework. -->
+    
+    <mx:Script>
+        <![CDATA[
+            import com.joeberkovitz.moccasin.event.EditorEvent;
+            import com.joeberkovitz.simpleworld.service.AppDocumentService;
+            import com.joeberkovitz.moccasin.service.BasicConfigurationService;
+            import com.joeberkovitz.moccasin.view.ViewInfo;
+            
+            private function handleInvoke(e:InvokeEvent):void
+            {
+                // This would be a logical place to handle command-line arguments, such as the filename of a document.
+            }
+            
+            private function onCreationComplete():void
+            {
+                // Create a configuration service to provide startup defaults to the editor
+                editor.configurationService = new BasicConfigurationService(null, null);
+
+                // initialize the editor and its menu bar
+                editor.initializeEditor();
+                editorMenuBar.editor = editor;
+            }
+        ]]>
+    </mx:Script>
+    
+    <mx:VBox id="editorBody" width="100%" height="100%" horizontalAlign="left">
+        <sweditor:AirAppMenuBar id="editorMenuBar" width="100%"/>
+        <sweditor:AirAppEditor id="editor" height="100%" width="100%" minHeight="50" minWidth="50"/>
+        <mx:HBox>
+            <mx:Label text="Zoom:"/>
+            <mx:HSlider id="scaleSlider" minimum="0.5" maximum="4" value="1" change="editor.setScale(scaleSlider.value)"/>
+        </mx:HBox>
+    </mx:VBox>
+    <mx:Label y="40" text="Click to create tones, drag/drop MP3 files to place sound clips."/>
+</mx:WindowedApplication>

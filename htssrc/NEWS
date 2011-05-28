@@ -1,0 +1,9 @@
+Version 1.00:
+ * first stable-version release.
+ * context-dependent GV without silent and pause phoneme.
+ * makefiles for nmake of VC.
+ * save detail information.
+ * bug fixes.
+
+Version 0.91:
+ * first beta-version release.

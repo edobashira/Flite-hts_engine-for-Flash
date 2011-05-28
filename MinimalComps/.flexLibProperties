@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flexLibProperties version="1">
+<includeClasses>
+<classEntry path="com.bit101.components.VSlider"/>
+<classEntry path="com.bit101.components.Style"/>
+<classEntry path="com.bit101.components.ProgressBar"/>
+<classEntry path="com.bit101.components.HSlider"/>
+<classEntry path="com.bit101.components.Label"/>
+<classEntry path="com.bit101.components.ColorChooser"/>
+<classEntry path="com.bit101.components.PushButton"/>
+<classEntry path="com.bit101.components.RadioButton"/>
+<classEntry path="com.bit101.components.Component"/>
+<classEntry path="com.bit101.components.CheckBox"/>
+<classEntry path="com.bit101.components.InputText"/>
+<classEntry path="com.bit101.components.Panel"/>
+<classEntry path="com.bit101.components.Slider"/>
+</includeClasses>
+<includeResources>
+<resourceEntry destPath="assets/pf_ronda_seven.ttf" sourcePath="assets/pf_ronda_seven.ttf"/>
+</includeResources>
+<namespaceManifests/>
+</flexLibProperties>
